@@ -1,0 +1,5 @@
+# Ignore .vious code directory
+.vious code/
+
+# Ignore virtual environment directory
+venv/
