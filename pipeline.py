@@ -1,6 +1,8 @@
 from mlx_lm import load, generate
 from IPython.display import Markdown
 from typing import List, Dict, Optional
+import os
+from mlx_lm.convert import convert
 
 # Dictionary of available models
 all_models = {
@@ -10,8 +12,21 @@ all_models = {
 }
 
 class LlamaPipeline:
-    def __init__(self, model_name: str = "mlx-community/Meta-Llama-3-8B-Instruct-8bit"):
-        self.model, self.tokenizer = load(model_name)
+    def __init__(self, model_name: str = "mlx-community/Meta-Llama-3-8B-Instruct-8bit", local_dir: str = "local_models"):
+        self.model_name = model_name
+        self.local_dir = local_dir
+        self.local_model_path = os.path.join(self.local_dir, model_name.split("/")[-1])
+        
+        if not os.path.exists(self.local_model_path):
+            self.download_and_save_model()
+        
+        self.model, self.tokenizer = load(self.local_model_path)
+
+    def download_and_save_model(self):
+        print(f"Downloading and converting model {self.model_name}...")
+        os.makedirs(self.local_dir, exist_ok=True)
+        convert(self.model_name, self.local_model_path)
+        print(f"Model saved to {self.local_model_path}")
 
     def prompt(
         self,
